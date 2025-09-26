@@ -64,5 +64,3 @@ Use the form to submit URLs for shortening.
 This project is licensed under the MIT License.
 
 ---
-
-Feel free to customize this README further to your needs. Would you like help setting up any other documentation or features?Here is a well-structured README file for your URL Shortener project. You can add this as `README.md` in your project root:
