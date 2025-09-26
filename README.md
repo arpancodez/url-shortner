@@ -1,85 +1,75 @@
-# Simple URL Shortener
+# URL Shortener Service
 
-A minimal Node.js URL shortener API built with Express.  
-This project lets you create short URLs and redirect to the original URLs instantly.
-
----
+A simple URL shortener web application built with Node.js, Express, TypeScript, and MongoDB.  
+The app allows users to input a long URL and generates a short, easily shareable URL that redirects to the original.
 
 ## Features
 
-- Shorten any valid URL to a unique 6-character code  
-- Redirect short URLs to their original URLs  
-- In-memory storage (no external database, perfect for learning and prototyping)  
+- Shorten long URLs to short keys
+- Redirect short URLs to original URLs
+- Simple admin dashboard to view all URLs and their click counts
+- Basic error handling and validation
+- Frontend form for easy URL submission
+- API routes for integration or custom frontends
 
----
+## Technologies Used
 
-## Getting Started
+- Node.js & Express (backend)
+- TypeScript for type safety
+- MongoDB + Mongoose for database
+- Axios for HTTP requests (frontend)
+- Basic HTML/CSS for UI
 
-### Prerequisites
+## Project Structure
 
-- Node.js and npm installed  
-- Basic knowledge of TypeScript  
+- `index.ts`: Main server file, sets up Express, routing, and database connection
+- `routes/`: API route handlers (auth, admin, URLs)
+- `models/`: Mongoose schemas for URLs and Users
+- `public/`: Static files served (including frontend HTML form)
+- `README.md`: Project documentation
 
-### Installation
+## Installation
 
-1. Save the code as `index.ts`
-
-2. Install dependencies:
-
-npm install express body-parser @types/express @types/body-parser
+1. Clone the repository  
+git clone <repo-url>
 
 text
 
-3. Run the server using ts-node:
-
-npx ts-node index.ts
+2. Install dependencies  
+npm install
 
 text
 
----
+3. Setup and start MongoDB server  
+- Install MongoDB Community edition if not installed  
+- Run `mongod` to start MongoDB service
+
+4. Run the development server  
+npm run dev
+
+text
+
+5. Open your browser at  
+http://localhost:3000
+
+text
+Use the form to submit URLs for shortening.
 
 ## Usage
 
-- To create a short URL, send a POST request to:
-
-http://localhost:3000/shorten
-
-text
-
-- Request body (JSON):
-
-{
-"url": "https://example.com"
-}
-
-text
-
-- The response will contain your shortened URL:
-
-{
-"shortUrl": "http://localhost:3000/abc123"
-}
-
-text
-
-- Visit the shortened URL in your browser (e.g., `http://localhost:3000/abc123`) to be redirected to the original URL.
-
----
+- Submit a URL in the input field on the main page and click **Shorten**  
+- The app returns a shortened URL to share or use
+- Access the admin dashboard at  `http://localhost:3000/admin/admin.html` for URL management
 
 ## Notes
 
-- This implementation stores URLs in memory, so all data will be lost when the server restarts.  
-- For deployment or production, integrate a persistent database.  
-- Input URL validation is minimal; consider adding more robust checks for your use case.
-
----
+- Make sure MongoDB is running locally on port 27017
+- This app is for learning/demo purposes, and can be extended with user authentication, analytics, etc.
 
 ## License
 
-MIT License
+This project is licensed under the MIT License.
 
 ---
 
-## Author
-
-Arpan. - [GitHub](https://github.com/arpancodez)
+Feel free to customize this README further to your needs. Would you like help setting up any other documentation or features?Here is a well-structured README file for your URL Shortener project. You can add this as `README.md` in your project root:
