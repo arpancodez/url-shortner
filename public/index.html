@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Simple URL Shortener</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; }
+    input, button { padding: 10px; font-size: 1rem; }
+    input { width: 300px; }
+    #result { margin-top: 20px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h2>URL Shortener</h2>
+  <form id="shortenForm">
+    <input id="originalUrl" type="text" placeholder="Enter URL to shorten" required />
+    <button type="submit">Shorten</button>
+  </form>
+  <div id="result"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    const form = document.getElementById('shortenForm');
+    const resultDiv = document.getElementById('result');
+
+    form.onsubmit = async function(event) {
+      event.preventDefault();
+      const originalUrl = document.getElementById('originalUrl').value;
+      try {
+        const response = await axios.post('/api/urls/shorten', { originalUrl });
+        const shortKey = response.data.shortenUrlKey || response.data.shortCode;
+        const shortUrl = `${window.location.origin}/${shortKey}`;
+        resultDiv.innerHTML = `Short URL: <a href="${shortUrl}" target="_blank">${shortUrl}</a>`;
+      } catch (error) {
+        resultDiv.textContent = 'Error shortening URL. Please try again.';
+      }
+    }
+  </script>
+</body>
+</html>
