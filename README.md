@@ -33,12 +33,8 @@ The app allows users to input a long URL and generates a short, easily shareable
 1. Clone the repository  
 git clone <repo-url>
 
-text
-
 2. Install dependencies  
 npm install
-
-text
 
 3. Setup and start MongoDB server  
 - Install MongoDB Community edition if not installed  
@@ -47,12 +43,9 @@ text
 4. Run the development server  
 npm run dev
 
-text
-
 5. Open your browser at  
 http://localhost:3000
 
-text
 Use the form to submit URLs for shortening.
 
 ## Usage
