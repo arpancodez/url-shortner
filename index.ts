@@ -1,13 +1,14 @@
-//install these npm install express body-parser crypto lowdb nanoid validator
 import express from "express";
 import bodyParser from "body-parser";
 import { nanoid } from "nanoid";
 import { Low, JSONFile } from "lowdb";
 import { join } from "path";
 import validator from "validator";
+import QRCode from "qrcode";
+import path from "path";
 
 // ------------------------
-// Database Setup (lowdb)
+// Types and DB Setup
 // ------------------------
 type UrlRecord = {
   originalUrl: string;
@@ -21,11 +22,10 @@ type Data = {
   urls: UrlRecord[];
 };
 
-const file = join(__dirname, "db.json");
-const adapter = new JSONFile<Data>(file);
+const dbFile = join(__dirname, "db.json");
+const adapter = new JSONFile<Data>(dbFile);
 const db = new Low<Data>(adapter);
 
-// Initialize database
 await db.read();
 db.data ||= { urls: [] };
 await db.write();
@@ -34,12 +34,15 @@ await db.write();
 // App Setup
 // ------------------------
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
 
+// Serve Admin Dashboard
+app.use("/admin", express.static(path.join(__dirname, "public")));
+
 // ------------------------
-// Utilities
+// Utility Functions
 // ------------------------
 function generateShortCode(): string {
   return nanoid(6);
@@ -59,18 +62,15 @@ function getUrlRecordByShortCode(shortCode: string): UrlRecord | undefined {
 app.post("/shorten", async (req, res) => {
   const { url, customCode, expiresIn } = req.body;
 
-  // Validate URL
   if (!url || !validator.isURL(url)) {
     return res.status(400).json({ error: "Invalid or missing URL." });
   }
 
-  // Reuse existing short URL if it already exists
   const existing = getUrlRecordByOriginalUrl(url);
   if (existing) {
     return res.json({ shortUrl: `${req.protocol}://${req.get("host")}/${existing.shortCode}` });
   }
 
-  // Validate custom code
   let shortCode = customCode || generateShortCode();
   if (customCode) {
     if (!/^[a-zA-Z0-9_-]{4,10}$/.test(customCode)) {
@@ -115,7 +115,6 @@ app.get("/:code", async (req, res) => {
     return res.status(404).send("Short URL not found.");
   }
 
-  // Check expiration
   if (record.expiresAt && new Date(record.expiresAt) < new Date()) {
     return res.status(410).send("This link has expired.");
   }
@@ -127,7 +126,7 @@ app.get("/:code", async (req, res) => {
 });
 
 // ------------------------
-// GET /analytics/:code - Stats
+// GET /analytics/:code
 // ------------------------
 app.get("/analytics/:code", (req, res) => {
   const { code } = req.params;
@@ -144,6 +143,36 @@ app.get("/analytics/:code", (req, res) => {
     expiresAt: record.expiresAt || null,
     clicks: record.clicks,
   });
+});
+
+// ------------------------
+// Admin Dashboard Routes
+// ------------------------
+
+// GET all records for dashboard
+app.get("/admin/data", (req, res) => {
+  res.json(db.data?.urls || []);
+});
+
+// Generate QR code image
+app.get("/qr/:code", async (req, res) => {
+  const { code } = req.params;
+  const record = getUrlRecordByShortCode(code);
+
+  if (!record) return res.status(404).send("Invalid code");
+
+  const shortUrl = `${req.protocol}://${req.get("host")}/${record.shortCode}`;
+  try {
+    const qr = await QRCode.toDataURL(shortUrl);
+    const img = Buffer.from(qr.split(",")[1], "base64");
+    res.writeHead(200, {
+      "Content-Type": "image/png",
+      "Content-Length": img.length,
+    });
+    res.end(img);
+  } catch (err) {
+    res.status(500).send("QR generation failed");
+  }
 });
 
 // ------------------------
